@@ -105,7 +105,6 @@ func GetChat(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("GetChat called") // log
 	chatSlugParam := chi.URLParam(r, "chat_ref")
 	userSlugParam := chi.URLParam(r, "user_ref")
-	// helpers.PrintJSON(botSlugParam)
 
 	var user models.User
 	var chat models.Chat
