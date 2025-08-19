@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"star_wars/m/internal/db"
+	"star_wars/m/internal/gemini"
 	"star_wars/m/internal/helpers"
 	"star_wars/m/internal/models"
 	"time"
@@ -166,11 +167,26 @@ func SendMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	aiMessage := gemini.MakeApiRequest(chat, data.Message)
+
+	var aiDbMessage models.ChatMessage
+
+	aiDbMessage.Message = aiMessage
+	aiDbMessage.ChatID = chat.ID
+	aiDbMessage.MessageType = "bot"
+	aiDbMessage.BotID = chat.BotID
+
+	if err := db.DB.Create(&aiDbMessage).Error; err != nil {
+		http.Error(w, "Cannot create chat message", 500)
+		return
+	}
+
 	var response helpers.Response
 	response.Result = "success"
 
 	var sendMessageResponse CreateMessageResponse
 	sendMessageResponse.CustomerMessage = customerMessage.Message
+	sendMessageResponse.BotMessage = aiMessage
 
 	response.Details = sendMessageResponse
 
