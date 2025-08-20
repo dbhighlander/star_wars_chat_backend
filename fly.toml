@@ -1,0 +1,3 @@
+[build]
+  dockerfile = "chat-service/Dockerfile"
+  context    = "chat-service"

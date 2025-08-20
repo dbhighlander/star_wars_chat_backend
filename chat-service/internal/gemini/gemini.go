@@ -95,13 +95,6 @@ func MakeApiRequest(chat models.Chat, message string) string {
 		log.Fatal(err)
 	}
 
-	// if len(geminiResponse.Candidates[0].Content) > 0 && len(request.Contents[0].Parts) > 0 {
-	// 	text := request.Contents[0].Parts[0].Text
-	// 	fmt.Println(text)
-	// } else {
-	// 	fmt.Println("No contents or parts available")
-	// }
-
 	geminiMessage := geminiResponse.Candidates[0].Content.Parts[0].Text
 
 	return geminiMessage
