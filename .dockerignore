@@ -1,0 +1,4 @@
+# flyctl launch added from .gitignore
+**\db-data
+**\.env.secrets
+fly.toml
