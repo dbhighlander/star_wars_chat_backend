@@ -3,11 +3,11 @@ RUN apk add --no-cache git
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY . .
 RUN ls /app
 RUN go mod download
 
-COPY . .
+
 
 RUN go build -o app .
 
