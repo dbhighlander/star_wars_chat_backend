@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"star_wars/m/internal/db"
 	"star_wars/m/internal/routes"
 
@@ -30,20 +31,22 @@ func main() {
 	r := chi.NewRouter()
 
 	// Set up CORS middleware
+	frontendURL := os.Getenv("FRONTEND_URL")
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"}, // your frontend
+		AllowedOrigins:   []string{"http://localhost:3000", frontendURL},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
 		AllowCredentials: true,
-		MaxAge:           300, // Maximum value not ignored by any browser
+		MaxAge:           300,
 	}))
 
 	// Register routes
 	routes.RegisterRoutes(r)
 
 	// Start server
-	port := ":8080"
-	log.Printf("Server listening on %s\n", port)
-	log.Fatal(http.ListenAndServe(port, r))
+	port := "8080"
+	addr := "0.0.0.0:" + port
+	log.Printf("Server listening on %s\n", addr)
+	log.Fatal(http.ListenAndServe(addr, r))
 }
