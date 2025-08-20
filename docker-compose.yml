@@ -1,6 +1,8 @@
 services:
   chat-service:
-    build: ./chat-service
+    build:
+      context: ./chat-service
+      dockerfile: Dockerfile.dev
     container_name: chat-service
     ports:
       - "${GO_PORT}:8080"
@@ -10,8 +12,7 @@ services:
       - mysql
     networks:
       - app-network
-    volumes:
-      - ./chat-service:/app         
+    volumes:     
       - /app/tmp
 
   mysql:
