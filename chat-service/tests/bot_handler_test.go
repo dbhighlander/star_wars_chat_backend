@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"testing"
-
 	"star_wars/m/internal/db"
 	"star_wars/m/internal/handlers"
 	"star_wars/m/internal/helpers"
 	"star_wars/m/internal/models"
+	"testing"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
@@ -57,8 +56,9 @@ func TestGetBotBySlug_Success(t *testing.T) {
 	assert.NoError(t, db.DB.Create(&bot).Error)
 
 	req := httptest.NewRequest("GET", "/bots/test-bot", nil)
-	rr := httptest.NewRecorder()
+	addAPIKeyHeader(req)
 
+	rr := httptest.NewRecorder()
 	router := setupRouter()
 	router.ServeHTTP(rr, req)
 
@@ -67,7 +67,6 @@ func TestGetBotBySlug_Success(t *testing.T) {
 	var response helpers.Response
 	assert.NoError(t, json.Unmarshal(rr.Body.Bytes(), &response))
 
-	// Decode Details into Bot struct
 	detailsBytes, _ := json.Marshal(response.Details)
 	var botData models.Bot
 	assert.NoError(t, json.Unmarshal(detailsBytes, &botData))
@@ -80,8 +79,9 @@ func TestGetBotBySlug_NotFound(t *testing.T) {
 	setupTestDB(t)
 
 	req := httptest.NewRequest("GET", "/bots/does-not-exist", nil)
-	rr := httptest.NewRecorder()
+	addAPIKeyHeader(req)
 
+	rr := httptest.NewRecorder()
 	router := setupRouter()
 	router.ServeHTTP(rr, req)
 
@@ -104,8 +104,9 @@ func TestGetBots_Success(t *testing.T) {
 	}
 
 	req := httptest.NewRequest("GET", "/bots", nil)
-	rr := httptest.NewRecorder()
+	addAPIKeyHeader(req)
 
+	rr := httptest.NewRecorder()
 	router := setupRouter()
 	router.ServeHTTP(rr, req)
 
@@ -114,7 +115,6 @@ func TestGetBots_Success(t *testing.T) {
 	var response helpers.Response
 	assert.NoError(t, json.Unmarshal(rr.Body.Bytes(), &response))
 
-	// Decode Details into slice of PublicBot
 	detailsBytes, _ := json.Marshal(response.Details)
 	var publicBots []handlers.PublicBot
 	assert.NoError(t, json.Unmarshal(detailsBytes, &publicBots))
@@ -130,8 +130,9 @@ func TestGetBots_Empty(t *testing.T) {
 	setupTestDB(t)
 
 	req := httptest.NewRequest("GET", "/bots", nil)
-	rr := httptest.NewRecorder()
+	addAPIKeyHeader(req)
 
+	rr := httptest.NewRecorder()
 	router := setupRouter()
 	router.ServeHTTP(rr, req)
 
@@ -144,5 +145,5 @@ func TestGetBots_Empty(t *testing.T) {
 	var publicBots []handlers.PublicBot
 	assert.NoError(t, json.Unmarshal(detailsBytes, &publicBots))
 
-	assert.Len(t, publicBots, 0) // no bots
+	assert.Len(t, publicBots, 0)
 }

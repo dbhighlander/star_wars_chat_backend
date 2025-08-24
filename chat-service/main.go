@@ -4,22 +4,17 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"star_wars/m/internal/appMiddleware"
 	"star_wars/m/internal/db"
+
 	"star_wars/m/internal/routes"
 
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 )
 
 func main() {
-	// dbHost := os.Getenv("DB_HOST")
-	// dbPort := os.Getenv("DB_PORT")
-	// dbUser := os.Getenv("DB_USER")
-	// dbPass := os.Getenv("DB_PASSWORD")
-	// dbName := os.Getenv("DB_NAME")
-
-	// log.Printf("Connecting to DB at %s:%s with user %s, db %s, pw %s", dbHost, dbPort, dbUser, dbName, dbPass)
-	// TODO: GORM connection here
 
 	if err := db.InitDB(); err != nil {
 		log.Fatal(err)
@@ -32,6 +27,14 @@ func main() {
 
 	// Set up CORS middleware
 	frontendURL := os.Getenv("FRONTEND_URL")
+
+	//add middleware
+	r.Use(middleware.RequestID)
+	r.Use(middleware.RealIP)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(appMiddleware.ApiAuth)
+
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000", frontendURL},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},

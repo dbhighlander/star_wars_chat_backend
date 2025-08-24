@@ -14,6 +14,7 @@ services:
       - app-network
     volumes:     
       - /app/tmp
+      - ./chat-service:/app
 
   mysql:
     image: mysql:9.4.0

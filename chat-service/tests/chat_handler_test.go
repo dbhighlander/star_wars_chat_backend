@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"star_wars/m/internal/db"
 	"star_wars/m/internal/handlers"
 	"star_wars/m/internal/helpers"
@@ -23,6 +24,12 @@ func setupChatRouter() *chi.Mux {
 	return r
 }
 
+// Add the API key header to a request
+func addAPIKeyHeader(req *http.Request) {
+	apiKey := os.Getenv("API_KEY")
+	req.Header.Set("X-API-Key", apiKey)
+}
+
 func TestCreateChat_Success(t *testing.T) {
 	setupTestDB(t)
 
@@ -31,8 +38,9 @@ func TestCreateChat_Success(t *testing.T) {
 	assert.NoError(t, db.DB.Create(&bot).Error)
 
 	req := httptest.NewRequest("POST", "/chat/test-bot", nil)
-	rr := httptest.NewRecorder()
+	addAPIKeyHeader(req)
 
+	rr := httptest.NewRecorder()
 	router := setupChatRouter()
 	router.ServeHTTP(rr, req)
 
@@ -42,7 +50,6 @@ func TestCreateChat_Success(t *testing.T) {
 	err := json.Unmarshal(rr.Body.Bytes(), &response)
 	assert.NoError(t, err, rr.Body.String())
 
-	// Parse nested CreateChatResponse
 	detailsBytes, _ := json.Marshal(response.Details)
 	var chatResp handlers.CreateChatResponse
 	err = json.Unmarshal(detailsBytes, &chatResp)
@@ -81,8 +88,9 @@ func TestGetChat_Success(t *testing.T) {
 	db.DB.Create(&msg)
 
 	req := httptest.NewRequest("GET", "/chat/chat123/user123", nil)
-	rr := httptest.NewRecorder()
+	addAPIKeyHeader(req)
 
+	rr := httptest.NewRecorder()
 	router := setupChatRouter()
 	router.ServeHTTP(rr, req)
 
@@ -108,8 +116,9 @@ func TestCreateChat_BotNotFound(t *testing.T) {
 	setupTestDB(t)
 
 	req := httptest.NewRequest("POST", "/chat/nonexistent-bot", nil)
-	rr := httptest.NewRecorder()
+	addAPIKeyHeader(req)
 
+	rr := httptest.NewRecorder()
 	router := setupChatRouter()
 	router.ServeHTTP(rr, req)
 
